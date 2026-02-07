@@ -1,0 +1,13 @@
+# Ignore all node modules everywhere
+node_modules/
+
+# Env files
+.env
+.env.*
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

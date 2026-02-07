@@ -12,7 +12,7 @@ class EmailScheduler {
 
   initializeTransporter() {
     const hasSmtpCreds = Boolean(process.env.SMTP_USER && process.env.SMTP_PASS);
-    
+
     if (hasSmtpCreds) {
       const smtpTransporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
@@ -22,6 +22,10 @@ class EmailScheduler {
           user: process.env.SMTP_USER,
           pass: process.env.SMTP_PASS,
         },
+        tls: {
+          rejectUnauthorized: false, // Accept self-signed certificates
+          minVersion: 'TLSv1.2'
+        }
       });
 
       this.transporter = smtpTransporter;
@@ -91,11 +95,11 @@ class EmailScheduler {
     };
 
     const config = urgencyConfig[urgencyLevel] || urgencyConfig.warning;
-    
+
     const subscriptionList = subscriptions.map(sub => {
       const daysLeft = this.getDaysUntilExpiration(sub.renewalDate);
       const status = daysLeft <= 0 ? 'EXPIRED' : `${daysLeft} day${daysLeft === 1 ? '' : 's'} left`;
-      
+
       return `
         <div style="background-color: #f8fafc; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid ${config.color};">
           <h4 style="margin: 0 0 8px 0; color: #1f2937;">${sub.serviceName}</h4>
@@ -126,14 +130,14 @@ class EmailScheduler {
             <h2 style="color: #1f2937; margin-top: 0;">Hi ${user.firstName},</h2>
             
             <p style="color: #374151; font-size: 16px; line-height: 1.6;">
-              ${urgencyLevel === 'expired' 
-                ? 'Your subscriptions have expired and need immediate attention!'
-                : urgencyLevel === 'critical'
-                ? 'Your subscriptions are expiring today! Please renew them immediately.'
-                : urgencyLevel === 'urgent'
-                ? 'Your subscriptions are expiring very soon. Don\'t miss out!'
-                : 'This is a friendly reminder about your upcoming subscription renewals.'
-              }
+              ${urgencyLevel === 'expired'
+          ? 'Your subscriptions have expired and need immediate attention!'
+          : urgencyLevel === 'critical'
+            ? 'Your subscriptions are expiring today! Please renew them immediately.'
+            : urgencyLevel === 'urgent'
+              ? 'Your subscriptions are expiring very soon. Don\'t miss out!'
+              : 'This is a friendly reminder about your upcoming subscription renewals.'
+        }
             </p>
 
             <div style="background-color: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 20px; margin: 20px 0;">
@@ -182,7 +186,7 @@ class EmailScheduler {
     let emailContent;
     try {
       emailContent = this.generateEmailContent(user, subscriptions, urgencyLevel);
-      
+
       const mailOptions = {
         from: process.env.FROM_EMAIL || process.env.SMTP_USER,
         to: user.email,
@@ -192,7 +196,7 @@ class EmailScheduler {
 
       await this.transporter.sendMail(mailOptions);
       console.log(`📧 ${urgencyLevel.toUpperCase()} email sent to ${user.email} for ${subscriptions.length} subscription(s)`);
-      
+
       // Log the email
       await EmailLog.create({
         user: user._id,
@@ -205,7 +209,7 @@ class EmailScheduler {
       });
     } catch (error) {
       console.error(`Failed to send ${urgencyLevel} email to ${user.email}:`, error);
-      
+
       // Log failed email
       try {
         await EmailLog.create({
@@ -233,13 +237,13 @@ class EmailScheduler {
 
     try {
       console.log('🔍 Starting daily subscription expiration check...');
-      
+
       // Get all active users with active subscriptions
       const users = await User.find({ isActive: true }).populate({
         path: 'subscriptions',
         match: { isActive: true }
       });
-      
+
       for (const user of users) {
         if (!user.subscriptions || user.subscriptions.length === 0) {
           continue;
@@ -257,7 +261,7 @@ class EmailScheduler {
         for (const subscription of user.subscriptions) {
           const daysUntilExpiration = this.getDaysUntilExpiration(subscription.renewalDate);
           const urgencyLevel = this.getUrgencyLevel(daysUntilExpiration);
-          
+
           if (urgencyLevel !== 'normal') {
             subscriptionsByUrgency[urgencyLevel].push(subscription);
           }
@@ -265,7 +269,7 @@ class EmailScheduler {
 
         // Send emails for each urgency level (highest priority first)
         const urgencyOrder = ['expired', 'critical', 'urgent', 'warning'];
-        
+
         for (const urgencyLevel of urgencyOrder) {
           if (subscriptionsByUrgency[urgencyLevel].length > 0) {
             await this.sendExpirationEmail(user, subscriptionsByUrgency[urgencyLevel], urgencyLevel);

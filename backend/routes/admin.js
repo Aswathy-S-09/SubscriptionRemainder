@@ -14,8 +14,8 @@ const router = express.Router();
 // Generate JWT token for admin
 const generateAdminToken = (adminId) => {
   return jwt.sign(
-    { adminId, isAdmin: true }, 
-    process.env.JWT_SECRET || 'fallback_secret', 
+    { adminId, isAdmin: true },
+    process.env.JWT_SECRET || 'fallback_secret',
     { expiresIn: process.env.JWT_EXPIRE || '7d' }
   );
 };
@@ -35,6 +35,10 @@ if (hasSmtpCreds) {
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
+    },
+    tls: {
+      rejectUnauthorized: false, // Accept self-signed certificates
+      minVersion: 'TLSv1.2'
     },
     connectionTimeout: 10000,
   });
@@ -135,30 +139,30 @@ router.get('/dashboard/stats', adminAuth, async (req, res) => {
   try {
     // Total users
     const totalUsers = await User.countDocuments({});
-    
+
     // Active subscriptions
-    const activeSubscriptions = await Subscription.countDocuments({ 
+    const activeSubscriptions = await Subscription.countDocuments({
       isActive: true,
       status: 'active'
     });
-    
+
     // Expired subscriptions
-    const expiredSubscriptions = await Subscription.countDocuments({ 
+    const expiredSubscriptions = await Subscription.countDocuments({
       status: 'expired'
     });
-    
+
     // Renewal reminders sent (from EmailLog)
-    const renewalReminders = await EmailLog.countDocuments({ 
+    const renewalReminders = await EmailLog.countDocuments({
       emailType: 'renewal_reminder'
     });
-    
+
     // Total email alerts triggered
     const emailAlerts = await EmailLog.countDocuments({});
-    
+
     // Subscription trends (last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    
+
     const subscriptionsLast30Days = await Subscription.aggregate([
       {
         $match: {
@@ -181,7 +185,7 @@ router.get('/dashboard/stats', adminAuth, async (req, res) => {
     // Weekly trends (last 12 weeks)
     const twelveWeeksAgo = new Date();
     twelveWeeksAgo.setDate(twelveWeeksAgo.getDate() - 84);
-    
+
     const weeklyTrends = await Subscription.aggregate([
       {
         $match: {
@@ -204,7 +208,7 @@ router.get('/dashboard/stats', adminAuth, async (req, res) => {
     // Monthly trends (last 12 months)
     const twelveMonthsAgo = new Date();
     twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
-    
+
     const monthlyTrends = await Subscription.aggregate([
       {
         $match: {
@@ -256,15 +260,15 @@ router.get('/users', adminAuth, async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-    
+
     const search = req.query.search || '';
     const sortBy = req.query.sortBy || 'createdAt';
     const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
     const filterStatus = req.query.status; // 'active' or 'inactive'
-    
+
     // Build query
     const query = {};
-    
+
     if (search) {
       query.$or = [
         { firstName: { $regex: search, $options: 'i' } },
@@ -272,11 +276,11 @@ router.get('/users', adminAuth, async (req, res) => {
         { email: { $regex: search, $options: 'i' } }
       ];
     }
-    
+
     if (filterStatus) {
       query.isActive = filterStatus === 'active';
     }
-    
+
     // Get users with subscription count
     const users = await User.find(query)
       .select('-password')
@@ -284,7 +288,7 @@ router.get('/users', adminAuth, async (req, res) => {
       .skip(skip)
       .limit(limit)
       .lean();
-    
+
     // Get subscription counts for each user
     const userIds = users.map(u => u._id);
     const subscriptionCounts = await Subscription.aggregate([
@@ -301,18 +305,18 @@ router.get('/users', adminAuth, async (req, res) => {
         }
       }
     ]);
-    
+
     const countMap = {};
     subscriptionCounts.forEach(item => {
       countMap[item._id.toString()] = item.count;
     });
-    
+
     users.forEach(user => {
       user.subscriptionCount = countMap[user._id.toString()] || 0;
     });
-    
+
     const total = await User.countDocuments(query);
-    
+
     res.json({
       success: true,
       data: {
@@ -341,27 +345,27 @@ router.put('/users/:id/status', adminAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { isActive } = req.body;
-    
+
     if (typeof isActive !== 'boolean') {
       return res.status(400).json({
         success: false,
         message: 'isActive must be a boolean value'
       });
     }
-    
+
     const user = await User.findByIdAndUpdate(
       id,
       { isActive },
       { new: true }
     ).select('-password');
-    
+
     if (!user) {
       return res.status(404).json({
         success: false,
         message: 'User not found'
       });
     }
-    
+
     res.json({
       success: true,
       message: `User ${isActive ? 'activated' : 'deactivated'} successfully`,
@@ -393,10 +397,10 @@ router.post('/users/:id/notify', [
         errors: errors.array()
       });
     }
-    
+
     const { id } = req.params;
     const { subject, message } = req.body;
-    
+
     const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({
@@ -404,7 +408,7 @@ router.post('/users/:id/notify', [
         message: 'User not found'
       });
     }
-    
+
     if (!hasSmtpCreds || !smtpReady) {
       EmailLogger.logEmail(
         'Admin Notification (Fallback)',
@@ -426,7 +430,7 @@ router.post('/users/:id/notify', [
         message: 'SMTP server unavailable. Notification logged locally instead.'
       });
     }
-    
+
     await transporter.sendMail({
       from: process.env.FROM_EMAIL || process.env.SMTP_USER,
       to: user.email,
@@ -442,7 +446,7 @@ router.post('/users/:id/notify', [
         </div>
       `
     });
-    
+
     // Log the email
     await EmailLog.create({
       user: user._id,
@@ -451,7 +455,7 @@ router.post('/users/:id/notify', [
       recipientEmail: user.email,
       status: 'sent'
     });
-    
+
     res.json({
       success: true,
       message: 'Notification sent successfully'
@@ -473,34 +477,34 @@ router.get('/subscriptions', adminAuth, async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-    
+
     const search = req.query.search || '';
     const status = req.query.status; // 'active', 'expired', 'cancelled'
     const sortBy = req.query.sortBy || 'createdAt';
     const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
-    
+
     // Build query
     const query = {};
-    
+
     if (search) {
       query.$or = [
         { serviceName: { $regex: search, $options: 'i' } },
         { plan: { $regex: search, $options: 'i' } }
       ];
     }
-    
+
     if (status) {
       query.status = status;
     }
-    
+
     const subscriptions = await Subscription.find(query)
       .populate('user', 'firstName lastName email')
       .sort({ [sortBy]: sortOrder })
       .skip(skip)
       .limit(limit);
-    
+
     const total = await Subscription.countDocuments(query);
-    
+
     res.json({
       success: true,
       data: {
@@ -544,9 +548,9 @@ router.post('/subscriptions', [
         errors: errors.array()
       });
     }
-    
+
     const { userId, ...subscriptionData } = req.body;
-    
+
     // Verify user exists
     const user = await User.findById(userId);
     if (!user) {
@@ -555,14 +559,14 @@ router.post('/subscriptions', [
         message: 'User not found'
       });
     }
-    
+
     const subscription = new Subscription({
       ...subscriptionData,
       user: userId
     });
-    
+
     await subscription.save();
-    
+
     res.status(201).json({
       success: true,
       message: 'Subscription created successfully',
@@ -598,25 +602,25 @@ router.put('/subscriptions/:id', [
         errors: errors.array()
       });
     }
-    
+
     const subscription = await Subscription.findById(req.params.id);
-    
+
     if (!subscription) {
       return res.status(404).json({
         success: false,
         message: 'Subscription not found'
       });
     }
-    
+
     // Update subscription
     Object.keys(req.body).forEach(key => {
       if (req.body[key] !== undefined) {
         subscription[key] = req.body[key];
       }
     });
-    
+
     await subscription.save();
-    
+
     res.json({
       success: true,
       message: 'Subscription updated successfully',
@@ -637,17 +641,17 @@ router.put('/subscriptions/:id', [
 router.delete('/subscriptions/:id', adminAuth, async (req, res) => {
   try {
     const subscription = await Subscription.findById(req.params.id);
-    
+
     if (!subscription) {
       return res.status(404).json({
         success: false,
         message: 'Subscription not found'
       });
     }
-    
+
     // Hard delete for admin
     await Subscription.findByIdAndDelete(req.params.id);
-    
+
     res.json({
       success: true,
       message: 'Subscription deleted successfully'
@@ -696,7 +700,7 @@ router.get('/subscriptions/plans', adminAuth, async (req, res) => {
         $sort: { subscriberCount: -1 }
       }
     ]);
-    
+
     res.json({
       success: true,
       data: plans

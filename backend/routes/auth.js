@@ -10,8 +10,8 @@ const router = express.Router();
 // Generate JWT token
 const generateToken = (userId) => {
   return jwt.sign(
-    { userId }, 
-    process.env.JWT_SECRET || 'fallback_secret', 
+    { userId },
+    process.env.JWT_SECRET || 'fallback_secret',
     { expiresIn: process.env.JWT_EXPIRE || '7d' }
   );
 };
@@ -40,6 +40,10 @@ if (hasSmtpCreds) {
       user: process.env.SMTP_USER, // Gmail address
       pass: process.env.SMTP_PASS, // App password
     },
+    tls: {
+      rejectUnauthorized: false, // Accept self-signed certificates
+      minVersion: 'TLSv1.2'
+    },
     connectionTimeout: 10000,
   });
 
@@ -59,7 +63,7 @@ if (hasSmtpCreds) {
   });
 }
 
- 
+
 
 // Send welcome email
 const sendWelcomeEmail = async (user, isLogin = false) => {
@@ -158,7 +162,7 @@ router.post('/register', [
     await user.save();
 
     // Send welcome email (async, don't wait)
-    sendWelcomeEmail(user, false).catch(err => 
+    sendWelcomeEmail(user, false).catch(err =>
       console.error('Welcome email failed:', err)
     );
 
@@ -242,7 +246,7 @@ router.post('/login', [
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email
-    }, true).catch(err => 
+    }, true).catch(err =>
       console.error('Welcome back email failed:', err)
     );
 
@@ -294,23 +298,29 @@ router.post('/google', [
 
     // Check if user exists
     let user = await User.findOne({ email });
-    
+
+    // Provide fallbacks for first/last name if empty (common issue with some Google profiles)
+    const finalFirstName = (firstName || email.split('@')[0]).trim() || 'Google';
+    const finalLastName = (lastName || 'User').trim();
+
     if (user) {
       // Update Google ID if not set
       if (!user.googleId) {
         user.googleId = googleId;
         user.provider = 'google';
+        user.firstName = finalFirstName;
+        user.lastName = finalLastName;
         await user.save();
       }
     } else {
       // Create new user
       user = new User({
-        firstName,
-        lastName,
+        firstName: finalFirstName,
+        lastName: finalLastName,
         email,
         googleId,
         provider: 'google',
-        password: 'google_oauth_user' // Dummy password for Google users
+        password: `google_${googleId}_${Math.random().toString(36).slice(-8)}` // Unusable random password
       });
       await user.save();
     }

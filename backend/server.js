@@ -36,7 +36,7 @@ app.use(limiter);
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
+  origin: process.env.NODE_ENV === 'production'
     ? ['https://yourdomain.com'] // Replace with your frontend domain
     : ['http://localhost:3000', 'http://127.0.0.1:3000'],
   credentials: true,
@@ -50,11 +50,23 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
+  const mongoose = require('mongoose');
+  const dbStatus = mongoose.connection.readyState;
+
+  // readyState values: 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
+  const dbConnected = dbStatus === 1;
+
   res.json({
     success: true,
     message: 'Subscribely API is running',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
+    database: {
+      connected: dbConnected,
+      status: dbStatus === 0 ? 'disconnected' :
+        dbStatus === 1 ? 'connected' :
+          dbStatus === 2 ? 'connecting' : 'disconnecting'
+    }
   });
 });
 
@@ -85,7 +97,7 @@ app.use('*', (req, res) => {
 // Global error handler
 app.use((err, req, res, next) => {
   console.error('Global error handler:', err);
-  
+
   res.status(err.status || 500).json({
     success: false,
     message: err.message || 'Internal server error',
@@ -93,14 +105,28 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔗 Health check: http://localhost:${PORT}/api/health`);
-  
-  // Start the email scheduler
-  emailScheduler.startDailyScheduler();
-});
+// Start server with port fallback
+function startServer(port) {
+  const server = app.listen(port, () => {
+    console.log(`🚀 Server running on port ${port}`);
+    console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🔗 Health check: http://localhost:${port}/api/health`);
+
+    // Start the email scheduler
+    emailScheduler.startDailyScheduler();
+  });
+
+  server.on('error', (e) => {
+    if (e.code === 'EADDRINUSE') {
+      console.log(`⚠️ Port ${port} is busy, retrying on port ${parseInt(port) + 1}...`);
+      server.close();
+      startServer(parseInt(port) + 1);
+    } else {
+      console.error('Server error:', e);
+    }
+  });
+}
+
+startServer(PORT);
 
 module.exports = app;

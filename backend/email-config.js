@@ -9,7 +9,7 @@ class EmailConfig {
 
   initializeTransporter() {
     const hasSmtpCreds = Boolean(process.env.SMTP_USER && process.env.SMTP_PASS);
-    
+
     if (!hasSmtpCreds) {
       console.log('⚠️ No SMTP credentials found. Emails will not be sent.');
       return;
@@ -17,7 +17,7 @@ class EmailConfig {
 
     // Try multiple SMTP configurations
     const configs = [
-      // Gmail with TLS
+      // Gmail with TLS (with certificate handling)
       {
         name: 'Gmail TLS',
         host: 'smtp.gmail.com',
@@ -27,8 +27,14 @@ class EmailConfig {
           user: process.env.SMTP_USER,
           pass: process.env.SMTP_PASS,
         },
+        tls: {
+          rejectUnauthorized: false, // Accept self-signed certificates
+          minVersion: 'TLSv1.2'
+        },
+        connectionTimeout: 5000, // 5 second timeout
+        greetingTimeout: 5000
       },
-      // Gmail with SSL
+      // Gmail with SSL (with certificate handling)
       {
         name: 'Gmail SSL',
         host: 'smtp.gmail.com',
@@ -38,8 +44,14 @@ class EmailConfig {
           user: process.env.SMTP_USER,
           pass: process.env.SMTP_PASS,
         },
+        tls: {
+          rejectUnauthorized: false, // Accept self-signed certificates
+          minVersion: 'TLSv1.2'
+        },
+        connectionTimeout: 5000, // 5 second timeout
+        greetingTimeout: 5000
       },
-      // Outlook/Hotmail
+      // Outlook/Hotmail (with certificate handling)
       {
         name: 'Outlook',
         host: 'smtp-mail.outlook.com',
@@ -49,10 +61,19 @@ class EmailConfig {
           user: process.env.SMTP_USER,
           pass: process.env.SMTP_PASS,
         },
+        tls: {
+          rejectUnauthorized: false, // Accept self-signed certificates
+          minVersion: 'TLSv1.2'
+        },
+        connectionTimeout: 5000, // 5 second timeout
+        greetingTimeout: 5000
       }
     ];
 
-    this.tryConfigurations(configs);
+    // Run configuration check in background (non-blocking)
+    this.tryConfigurations(configs).catch(err => {
+      console.error('Email configuration error:', err);
+    });
   }
 
   async tryConfigurations(configs) {
@@ -60,16 +81,22 @@ class EmailConfig {
       try {
         console.log(`🔄 Trying ${config.name}...`);
         const transporter = nodemailer.createTransport(config);
-        
-        await new Promise((resolve, reject) => {
-          transporter.verify((error, success) => {
-            if (error) {
-              reject(error);
-            } else {
-              resolve(success);
-            }
-          });
-        });
+
+        // Add timeout to verification
+        await Promise.race([
+          new Promise((resolve, reject) => {
+            transporter.verify((error, success) => {
+              if (error) {
+                reject(error);
+              } else {
+                resolve(success);
+              }
+            });
+          }),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Verification timeout')), 10000)
+          )
+        ]);
 
         console.log(`✅ ${config.name} connection successful!`);
         this.transporter = transporter;
