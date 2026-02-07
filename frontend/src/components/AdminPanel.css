@@ -1,0 +1,179 @@
+.admin-panel {
+  min-height: 100vh;
+  background: #f3f4f6;
+}
+
+.admin-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.admin-header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.btn-logout {
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-logout:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.admin-nav {
+  background: white;
+  border-bottom: 2px solid #e5e7eb;
+  padding: 0 20px;
+  display: flex;
+  gap: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.nav-button {
+  padding: 15px 25px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #6b7280;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.nav-button:hover {
+  color: #667eea;
+  background: #f9fafb;
+}
+
+.nav-button.active {
+  color: #667eea;
+  border-bottom-color: #667eea;
+  background: #f9fafb;
+}
+
+.admin-main {
+  padding: 20px;
+  min-height: calc(100vh - 200px);
+}
+
+/* Tablet Styles */
+@media (max-width: 1024px) {
+  .admin-header-content {
+    padding: 0 15px;
+  }
+  
+  .admin-header h1 {
+    font-size: 1.75rem;
+  }
+  
+  .admin-nav {
+    padding: 0 15px;
+  }
+  
+  .admin-main {
+    padding: 15px;
+  }
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .admin-header {
+    padding: 15px 0;
+  }
+  
+  .admin-header-content {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+    padding: 0 15px;
+  }
+  
+  .admin-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .btn-logout {
+    width: 100%;
+    max-width: 200px;
+    padding: 10px;
+    font-size: 0.95rem;
+  }
+  
+  .admin-nav {
+    padding: 0 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+  }
+  
+  .nav-button {
+    padding: 12px 15px;
+    font-size: 0.9rem;
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+  }
+  
+  .admin-main {
+    padding: 10px;
+    min-height: calc(100vh - 180px);
+  }
+}
+
+/* Small Mobile Styles */
+@media (max-width: 480px) {
+  .admin-header {
+    padding: 12px 0;
+  }
+  
+  .admin-header-content {
+    padding: 0 10px;
+    gap: 12px;
+  }
+  
+  .admin-header h1 {
+    font-size: 1.3rem;
+  }
+  
+  .btn-logout {
+    font-size: 0.85rem;
+    padding: 8px 16px;
+  }
+  
+  .admin-nav {
+    padding: 0 8px;
+    gap: 4px;
+  }
+  
+  .nav-button {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    min-width: 100px;
+  }
+  
+  .admin-main {
+    padding: 8px;
+  }
+}
+

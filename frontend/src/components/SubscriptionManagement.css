@@ -1,0 +1,582 @@
+.subscription-management {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.subscription-management h1 {
+  color: #1e40af;
+  font-size: 2.5rem;
+  margin: 0;
+}
+
+.btn-add {
+  padding: 12px 24px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.btn-add:hover {
+  background: #5568d3;
+}
+
+.filters-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-box input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.filter-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-controls select,
+.filter-controls button {
+  padding: 10px 15px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: white;
+  cursor: pointer;
+}
+
+.filter-controls button:hover {
+  background: #f3f4f6;
+}
+
+.subscriptions-table-container {
+  overflow-x: auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+}
+
+.subscriptions-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.subscriptions-table thead {
+  background: #f3f4f6;
+}
+
+.subscriptions-table th {
+  padding: 15px;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.subscriptions-table td {
+  padding: 15px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.subscriptions-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.subscriptions-table td small {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.status-badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-badge.active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.expired {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-badge.cancelled {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-edit,
+.btn-delete {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-edit {
+  background: #667eea;
+  color: white;
+}
+
+.btn-edit:hover {
+  background: #5568d3;
+}
+
+.btn-delete {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #dc2626;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.pagination button {
+  padding: 10px 20px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #f3f4f6;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.plans-section {
+  margin-top: 40px;
+}
+
+.plans-section h2 {
+  color: #1e40af;
+  margin-bottom: 20px;
+  font-size: 2rem;
+}
+
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.plan-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #667eea;
+}
+
+.plan-card h3 {
+  color: #1e40af;
+  margin: 0 0 10px 0;
+  font-size: 1.3rem;
+}
+
+.plan-name {
+  color: #6b7280;
+  margin: 0 0 15px 0;
+  font-weight: 500;
+}
+
+.plan-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.stat-item:last-child {
+  border-bottom: none;
+}
+
+.stat-label {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.stat-value {
+  color: #1e40af;
+  font-weight: 600;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-content h2 {
+  color: #1e40af;
+  margin-bottom: 20px;
+}
+
+.modal-content .form-group {
+  margin-bottom: 20px;
+}
+
+.modal-content .form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.modal-content .form-group input,
+.modal-content .form-group select,
+.modal-content .form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.modal-content .form-group input:focus,
+.modal-content .form-group select:focus,
+.modal-content .form-group textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.btn-cancel,
+.btn-save {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.btn-cancel:hover {
+  background: #e5e7eb;
+}
+
+.btn-save {
+  background: #667eea;
+  color: white;
+}
+
+.btn-save:hover {
+  background: #5568d3;
+}
+
+.no-data {
+  text-align: center;
+  padding: 40px;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.error-message {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+/* Tablet Styles */
+@media (max-width: 1024px) {
+  .subscription-management {
+    padding: 15px;
+  }
+  
+  .subscription-management h1 {
+    font-size: 2rem;
+  }
+  
+  .header-section {
+    margin-bottom: 25px;
+  }
+  
+  .plans-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .subscription-management {
+    padding: 10px;
+  }
+  
+  .subscription-management h1 {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+  
+  .header-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .btn-add {
+    width: 100%;
+    padding: 12px;
+    font-size: 0.95rem;
+  }
+  
+  .filters-section {
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+  
+  .search-box input {
+    padding: 10px;
+    font-size: 0.95rem;
+  }
+  
+  .filter-controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .filter-controls select,
+  .filter-controls button {
+    width: 100%;
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+  
+  .subscriptions-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;
+  }
+  
+  .subscriptions-table {
+    font-size: 0.85rem;
+    min-width: 700px;
+  }
+  
+  .subscriptions-table th,
+  .subscriptions-table td {
+    padding: 10px 8px;
+    white-space: nowrap;
+  }
+  
+  .subscriptions-table th:first-child,
+  .subscriptions-table td:first-child {
+    position: sticky;
+    left: 0;
+    background: white;
+    z-index: 1;
+  }
+  
+  .subscriptions-table thead th:first-child {
+    background: #f3f4f6;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .btn-edit,
+  .btn-delete {
+    width: 100%;
+    padding: 8px;
+    font-size: 0.8rem;
+  }
+  
+  .pagination {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .pagination button {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+  
+  .plans-section {
+    margin-top: 30px;
+  }
+  
+  .plans-section h2 {
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 15px;
+  }
+  
+  .plans-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .plan-card {
+    padding: 15px;
+  }
+  
+  .modal-content {
+    width: 95%;
+    padding: 20px;
+    margin: 10px;
+  }
+  
+  .modal-content h2 {
+    font-size: 1.2rem;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .modal-actions {
+    flex-direction: column;
+  }
+  
+  .btn-cancel,
+  .btn-save {
+    width: 100%;
+  }
+}
+
+/* Small Mobile Styles */
+@media (max-width: 480px) {
+  .subscription-management {
+    padding: 8px;
+  }
+  
+  .subscription-management h1 {
+    font-size: 1.3rem;
+  }
+  
+  .filters-section {
+    padding: 12px;
+  }
+  
+  .subscriptions-table {
+    font-size: 0.75rem;
+    min-width: 600px;
+  }
+  
+  .subscriptions-table th,
+  .subscriptions-table td {
+    padding: 8px 6px;
+  }
+  
+  .status-badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+  }
+  
+  .plans-section h2 {
+    font-size: 1.3rem;
+  }
+  
+  .plan-card h3 {
+    font-size: 1.1rem;
+  }
+  
+  .modal-content {
+    padding: 15px;
+  }
+  
+  .modal-content h2 {
+    font-size: 1.1rem;
+  }
+}
+
