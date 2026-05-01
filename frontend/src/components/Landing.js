@@ -114,10 +114,10 @@ const Landing = ({ onAuthSuccess }) => {
                 </li>
               </ul>
               <div className="social-row">
-                <a href="#" aria-label="Facebook" className="social-icon"><Facebook size={18} /></a>
-                <a href="#" aria-label="Twitter" className="social-icon"><Twitter size={18} /></a>
-                <a href="#" aria-label="Instagram" className="social-icon"><Instagram size={18} /></a>
-                <a href="#" aria-label="LinkedIn" className="social-icon"><Linkedin size={18} /></a>
+                <a href="/" aria-label="Facebook" className="social-icon"><Facebook size={18} /></a>
+                <a href="/" aria-label="Twitter" className="social-icon"><Twitter size={18} /></a>
+                <a href="/" aria-label="Instagram" className="social-icon"><Instagram size={18} /></a>
+                <a href="/" aria-label="LinkedIn" className="social-icon"><Linkedin size={18} /></a>
               </div>
             </div>
             <div className="contact-card">
@@ -164,7 +164,7 @@ const Landing = ({ onAuthSuccess }) => {
               <li><a href="#contact">Contact</a></li>
             </ul>
           </div>
-          
+
         </div>
         <div className="footer-bottom">
           <div className="container">© {new Date().getFullYear()} Subscribely. All Rights Reserved.</div>
