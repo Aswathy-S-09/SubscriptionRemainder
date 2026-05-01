@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, CreditCard, Save } from 'lucide-react';
+import { Calendar, Save } from 'lucide-react';
 
 const AddSubscription = ({ onAdd }) => {
   const getFallbackLogo = (serviceName, bgColor = '#667eea') => {
@@ -114,7 +114,7 @@ const AddSubscription = ({ onAdd }) => {
     setSelectedService(service);
     const firstPlan = service.plans[0];
     console.log('First plan:', firstPlan);
-    
+
     const newFormData = {
       serviceName: service.name,
       serviceLogo: service.logo,
@@ -126,7 +126,7 @@ const AddSubscription = ({ onAdd }) => {
       totalAmount: firstPlan.price * 1, // Calculate for 1 month initially
       renewalDate: calculateRenewalDate(1)
     };
-    
+
     console.log('New form data:', newFormData);
     setFormData(prev => ({
       ...prev,
@@ -136,12 +136,12 @@ const AddSubscription = ({ onAdd }) => {
 
   const handlePlanChange = (planName) => {
     console.log('Plan changed to:', planName);
-    
+
     if (!selectedService || !planName) return;
-    
+
     const selectedPlan = selectedService.plans.find(p => p.name === planName);
     console.log('Selected plan:', selectedPlan);
-    
+
     if (selectedPlan) {
       const updatedFormData = {
         plan: selectedPlan.name,
@@ -150,7 +150,7 @@ const AddSubscription = ({ onAdd }) => {
         totalAmount: selectedPlan.price * formData.planDuration, // Calculate with current duration
         renewalDate: calculateRenewalDate(formData.planDuration)
       };
-      
+
       console.log('Updated form data:', updatedFormData);
       setFormData(prev => ({
         ...prev,
@@ -161,12 +161,12 @@ const AddSubscription = ({ onAdd }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
+
     if (name === 'planDuration') {
       const duration = parseInt(value) || 1;
       const totalAmount = formData.price * duration;
       const renewalDate = calculateRenewalDate(duration);
-      
+
       setFormData(prev => ({
         ...prev,
         [name]: duration,
@@ -183,14 +183,14 @@ const AddSubscription = ({ onAdd }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!formData.serviceName || !formData.plan || !formData.price || !formData.renewalDate) {
       alert('Please fill in all required fields');
       return;
     }
 
     onAdd(formData);
-    
+
     // Reset form
     setFormData({
       serviceName: '',
@@ -204,14 +204,14 @@ const AddSubscription = ({ onAdd }) => {
       serviceUrl: ''
     });
     setSelectedService(null);
-    
+
     alert('Subscription added successfully!');
   };
 
   return (
     <div className="form-container">
       <h1 className="text-center mb-4">Add New Subscription</h1>
-      
+
       <div className="card">
         <form onSubmit={handleSubmit}>
           {/* Service Selection */}

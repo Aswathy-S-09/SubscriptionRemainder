@@ -6,7 +6,6 @@ import './Auth.css';
 
 const Auth = ({ onAuthSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
   const [backendConnected, setBackendConnected] = useState(null);
   const [databaseConnected, setDatabaseConnected] = useState(null);
 
@@ -49,7 +48,7 @@ const Auth = ({ onAuthSuccess }) => {
       }
     }
 
-    setIsLoading(true);
+
     console.log('Login attempt:', loginData);
 
     // Check if admin credentials
@@ -132,13 +131,11 @@ const Auth = ({ onAuthSuccess }) => {
       }
 
       alert(errorMsg);
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const handleSignup = async (signupData) => {
-    setIsLoading(true);
+
     console.log('Signup attempt:', signupData);
 
     try {
@@ -167,8 +164,6 @@ const Auth = ({ onAuthSuccess }) => {
     } catch (error) {
       console.error('Signup error:', error);
       alert(error.message || 'An error occurred during signup. Please try again.');
-    } finally {
-      setIsLoading(false);
     }
   };
 

@@ -3,7 +3,6 @@ import Header from './components/Header';
 import Dashboard from './components/Dashboard';
 import AddSubscription from './components/AddSubscription';
 import SubscriptionList from './components/SubscriptionList';
-import Auth from './components/Auth';
 import Landing from './components/Landing';
 import AdminPanel from './components/AdminPanel';
 import apiService from './services/api';
@@ -16,8 +15,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [admin, setAdmin] = useState(null);
-
+  const [, setAdmin] = useState(null);
   // Check if user is admin on mount
   useEffect(() => {
     const adminStatus = localStorage.getItem('isAdmin');
@@ -84,7 +82,7 @@ function App() {
     try {
       const response = await apiService.updateSubscription(id, updatedSubscription);
       if (response.success) {
-    setSubscriptions(subscriptions.map(sub => 
+        setSubscriptions(subscriptions.map(sub =>
           sub._id === id ? response.data : sub
         ));
         alert('Subscription updated successfully!');
@@ -106,7 +104,7 @@ function App() {
       console.log('Admin authentication successful:', authResult);
       return;
     }
-    
+
     // Regular user login
     setUser(authResult.user);
     setIsAuthenticated(true);
@@ -147,8 +145,8 @@ function App() {
         return <AddSubscription onAdd={addSubscription} />;
       case 'list':
         return (
-          <SubscriptionList 
-            subscriptions={subscriptions} 
+          <SubscriptionList
+            subscriptions={subscriptions}
             onDelete={deleteSubscription}
             onUpdate={updateSubscription}
           />
@@ -170,9 +168,9 @@ function App() {
 
   return (
     <div className="App">
-      <Header 
-        activeTab={activeTab} 
-        onTabChange={setActiveTab} 
+      <Header
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
         user={user}
         onLogout={handleLogout}
       />

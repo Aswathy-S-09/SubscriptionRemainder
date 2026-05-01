@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { User, Mail, Lock, Eye, EyeOff, UserPlus, Check } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, UserPlus } from 'lucide-react';
 import './Auth.css';
 
 const Signup = ({ onSwitchToLogin, onSignup, onGoogleCredential }) => {
