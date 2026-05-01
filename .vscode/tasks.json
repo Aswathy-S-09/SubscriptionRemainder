@@ -1,0 +1,23 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run Go Backend",
+			"type": "shell",
+			"command": "cd backend-go && go run server.go",
+			"args": [],
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": ""
+		},
+		{
+			"label": "Run Go Backend",
+			"type": "shell",
+			"command": "cd \"c:\\Users\\smeha\\OneDrive\\Desktop\\subscribley google\\subscribley\\subscribley\\fullstack\\backend-go\" && go run server.go",
+			"args": [],
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": ""
+		}
+	]
+}

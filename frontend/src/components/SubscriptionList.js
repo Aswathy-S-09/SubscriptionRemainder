@@ -3,6 +3,7 @@ import { format, differenceInDays } from 'date-fns';
 import { Edit, Trash2, Eye, EyeOff, ExternalLink } from 'lucide-react';
 
 const SubscriptionList = ({ subscriptions, onDelete, onUpdate }) => {
+  const safeSubscriptions = Array.isArray(subscriptions) ? subscriptions : [];
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [showPrices, setShowPrices] = useState(true);
@@ -32,7 +33,7 @@ const SubscriptionList = ({ subscriptions, onDelete, onUpdate }) => {
   const handleSave = () => {
     if (editForm.serviceName && editForm.price && editForm.renewalDate) {
       onUpdate(editingId, {
-        ...subscriptions.find(sub => sub.id === editingId),
+        ...safeSubscriptions.find(sub => sub.id === editingId),
         ...editForm
       });
       setEditingId(null);
@@ -51,7 +52,7 @@ const SubscriptionList = ({ subscriptions, onDelete, onUpdate }) => {
     onDelete(id);
   };
 
-  if (subscriptions.length === 0) {
+  if (safeSubscriptions.length === 0) {
     return (
       <div className="empty-state">
         <div className="empty-state-icon">📺</div>
@@ -78,7 +79,7 @@ const SubscriptionList = ({ subscriptions, onDelete, onUpdate }) => {
       </div>
 
       <div className="subscriptions-table">
-        {subscriptions.map(subscription => {
+        {safeSubscriptions.map(subscription => {
           const status = getSubscriptionStatus(subscription);
           const daysUntilRenewal = differenceInDays(new Date(subscription.renewalDate), new Date());
           

@@ -20,9 +20,11 @@ const Auth = ({ onAuthSuccess }) => {
       const response = await apiService.healthCheck();
       setBackendConnected(response.success);
       setDatabaseConnected(response.database?.connected ?? true);
+      return response.success;
     } catch (error) {
       setBackendConnected(false);
       setDatabaseConnected(false);
+      return false;
     }
   };
 
@@ -38,8 +40,8 @@ const Auth = ({ onAuthSuccess }) => {
         'Would you like to retry the connection?'
       );
       if (confirmed) {
-        await checkBackendConnection();
-        if (!backendConnected) {
+        const isConnected = await checkBackendConnection();
+        if (!isConnected) {
           return;
         }
       } else {

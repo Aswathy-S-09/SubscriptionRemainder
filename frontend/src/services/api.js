@@ -5,6 +5,37 @@ class ApiService {
     this.baseURL = API_BASE_URL;
   }
 
+  getFallbackBaseUrls() {
+    const normalizedBase = this.baseURL.replace(/\/+$/, '');
+    const fallbackBases = [normalizedBase];
+
+    if (/\/api$/i.test(normalizedBase)) {
+      fallbackBases.push(normalizedBase.replace(/\/api$/i, ''));
+    } else {
+      fallbackBases.push(`${normalizedBase}/api`);
+    }
+
+    fallbackBases.push('http://localhost:5000/api');
+    fallbackBases.push('http://127.0.0.1:5000/api');
+
+    return [...new Set(fallbackBases)];
+  }
+
+  async healthCheckRequest(url) {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: this.getHeaders()
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || `HTTP error! status: ${response.status}`);
+    }
+
+    return data;
+  }
+
   // Get auth token from localStorage
   getToken() {
     return localStorage.getItem('token');
@@ -31,29 +62,47 @@ class ApiService {
 
   // Generic request method
   async request(endpoint, options = {}) {
-    const url = `${this.baseURL}${endpoint}`;
     const config = {
       headers: this.getHeaders(),
       ...options
     };
 
-    try {
-      const response = await fetch(url, config);
-      const data = await response.json();
+    const baseUrls = this.getFallbackBaseUrls();
+    let lastError;
 
-      if (!response.ok) {
-        throw new Error(data.message || `HTTP error! status: ${response.status}`);
-      }
+    for (const baseUrl of baseUrls) {
+      const url = `${baseUrl}${endpoint}`;
 
-      return data;
-    } catch (error) {
-      console.error('API request failed:', error);
-      // Don't throw network errors, return a proper error response
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        throw new Error('Unable to connect to server. Please check if the backend is running.');
+      try {
+        const response = await fetch(url, config);
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        }
+
+        if (this.baseURL !== baseUrl) {
+          this.baseURL = baseUrl;
+        }
+
+        return data;
+      } catch (error) {
+        lastError = error;
+
+        // For HTTP errors (valid backend response), don't keep retrying other base URLs.
+        if (!(error.name === 'TypeError' && error.message.includes('fetch'))) {
+          console.error('API request failed:', error);
+          throw error;
+        }
       }
-      throw error;
     }
+
+    console.error('API request failed:', lastError);
+    if (lastError?.name === 'TypeError' && lastError.message.includes('fetch')) {
+      throw new Error('Unable to connect to server. Please check if the backend is running.');
+    }
+
+    throw lastError;
   }
 
   // Auth endpoints
@@ -148,7 +197,34 @@ class ApiService {
 
   // Health check
   async healthCheck() {
-    return this.request('/health');
+    try {
+      return await this.request('/health');
+    } catch (primaryError) {
+      const normalizedBase = this.baseURL.replace(/\/+$/, '');
+      const fallbackUrls = [];
+
+      if (!/\/api$/i.test(normalizedBase)) {
+        fallbackUrls.push(`${normalizedBase}/api/health`);
+      }
+
+      if (/\/api$/i.test(normalizedBase)) {
+        fallbackUrls.push(`${normalizedBase.replace(/\/api$/i, '')}/api/health`);
+      }
+
+      fallbackUrls.push('http://localhost:5000/api/health');
+
+      const uniqueFallbackUrls = [...new Set(fallbackUrls)];
+
+      for (const url of uniqueFallbackUrls) {
+        try {
+          return await this.healthCheckRequest(url);
+        } catch (fallbackError) {
+          // try next fallback URL
+        }
+      }
+
+      throw primaryError;
+    }
   }
 
   // Admin endpoints

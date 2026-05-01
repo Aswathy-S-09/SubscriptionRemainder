@@ -2,6 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, CreditCard, Save } from 'lucide-react';
 
 const AddSubscription = ({ onAdd }) => {
+  const getFallbackLogo = (serviceName, bgColor = '#667eea') => {
+    const initials = serviceName
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase();
+
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'>
+      <rect width='96' height='96' rx='18' fill='${bgColor}'/>
+      <text x='50%' y='56%' text-anchor='middle' dominant-baseline='middle' fill='white' font-family='Arial, sans-serif' font-size='30' font-weight='700'>${initials}</text>
+    </svg>`;
+
+    return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  };
+
   const [formData, setFormData] = useState({
     serviceName: '',
     plan: '',
@@ -62,7 +78,7 @@ const AddSubscription = ({ onAdd }) => {
     },
     {
       name: 'Zee5',
-      logo: 'https://logos-world.net/wp-content/uploads/2021/11/ZEE5-Emblem.png',
+      logo: 'https://www.zee5.com/images/ZEE5_logo.svg',
       color: '#FF6B35',
       url: 'https://www.zee5.com/',
       plans: [
@@ -208,7 +224,14 @@ const AddSubscription = ({ onAdd }) => {
                   className={`service-option ${selectedService?.name === service.name ? 'selected' : ''}`}
                   onClick={() => handleServiceSelect(service)}
                 >
-                  <img src={service.logo} alt={service.name} />
+                  <img
+                    src={service.logo}
+                    alt={service.name}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = getFallbackLogo(service.name, service.color);
+                    }}
+                  />
                   <span>{service.name}</span>
                 </div>
               ))}

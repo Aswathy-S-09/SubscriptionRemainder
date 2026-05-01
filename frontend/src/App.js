@@ -37,7 +37,7 @@ function App() {
     try {
       const response = await apiService.getSubscriptions();
       if (response.success) {
-        setSubscriptions(response.data);
+        setSubscriptions(Array.isArray(response.data) ? response.data : []);
       }
     } catch (error) {
       console.error('Failed to load subscriptions:', error);
@@ -52,7 +52,7 @@ function App() {
     try {
       const response = await apiService.createSubscription(subscription);
       if (response.success) {
-        setSubscriptions([...subscriptions, response.data]);
+        setSubscriptions([...(Array.isArray(subscriptions) ? subscriptions : []), response.data]);
         alert('Subscription added successfully!');
       } else {
         alert(response.message || 'Failed to add subscription');

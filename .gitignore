@@ -1,13 +1,13 @@
-# Ignore all node modules everywhere
+# Dependencies (anywhere)
 node_modules/
 
-# Env files
+# Environment files
 .env
 .env.*
 
 # Logs
 *.log
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db

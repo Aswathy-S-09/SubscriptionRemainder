@@ -4,6 +4,8 @@ import { AlertTriangle, Clock } from 'lucide-react';
 import apiService from '../services/api';
 
 const Dashboard = ({ subscriptions }) => {
+  const safeSubscriptions = Array.isArray(subscriptions) ? subscriptions : [];
+
   const getSubscriptionStatus = (subscription) => {
     const daysUntilRenewal = differenceInDays(new Date(subscription.renewalDate), new Date());
     
@@ -17,18 +19,18 @@ const Dashboard = ({ subscriptions }) => {
   };
 
   const getTotalMonthlyCost = () => {
-    return subscriptions.reduce((total, sub) => total + parseFloat(sub.price), 0);
+    return safeSubscriptions.reduce((total, sub) => total + parseFloat(sub.price), 0);
   };
 
   const getExpiringSoon = () => {
-    return subscriptions.filter(sub => {
+    return safeSubscriptions.filter(sub => {
       const daysUntilRenewal = differenceInDays(new Date(sub.renewalDate), new Date());
       return daysUntilRenewal <= 7 && daysUntilRenewal >= 0;
     });
   };
 
   const getExpired = () => {
-    return subscriptions.filter(sub => {
+    return safeSubscriptions.filter(sub => {
       const daysUntilRenewal = differenceInDays(new Date(sub.renewalDate), new Date());
       return daysUntilRenewal < 0;
     });
@@ -78,7 +80,7 @@ const Dashboard = ({ subscriptions }) => {
     }
   };
 
-  if (subscriptions.length === 0) {
+  if (safeSubscriptions.length === 0) {
     return (
       <div className="empty-state">
         <div className="empty-state-icon">📺</div>
@@ -96,7 +98,7 @@ const Dashboard = ({ subscriptions }) => {
       <div className="grid grid-3 mb-4">
         <div className="card text-center">
           <h3>Total Subscriptions</h3>
-          <div className="days-remaining">{subscriptions.length}</div>
+          <div className="days-remaining">{safeSubscriptions.length}</div>
           <p>Active services</p>
         </div>
         
@@ -137,7 +139,7 @@ const Dashboard = ({ subscriptions }) => {
 
       {/* Subscription Cards */}
       <div className="grid grid-2">
-        {subscriptions.map(subscription => {
+        {safeSubscriptions.map(subscription => {
           const status = getSubscriptionStatus(subscription);
           const daysUntilRenewal = differenceInDays(new Date(subscription.renewalDate), new Date());
           

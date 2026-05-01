@@ -8,24 +8,24 @@ const initAdmin = async () => {
     // Connect to database
     await connectDB();
     
-    // Check if admin already exists
-    const existingAdmin = await Admin.findOne({ email: 'subscriblyinfo@gmail.com' });
+    // Create or update admin user
+    const admin = await Admin.findOne({ email: 'subscriblyinfo@gmail.com' });
     
-    if (existingAdmin) {
-      console.log('Admin user already exists');
-      process.exit(0);
+    if (admin) {
+      admin.password = 'achu0910';
+      await admin.save();
+      console.log('✅ Admin user updated successfully');
+    } else {
+      const newAdmin = new Admin({
+        email: 'subscriblyinfo@gmail.com',
+        password: 'achu0910',
+        role: 'admin',
+        isActive: true
+      });
+      await newAdmin.save();
+      console.log('✅ Admin user created successfully');
     }
     
-    // Create admin user
-    const admin = new Admin({
-      email: 'subscriblyinfo@gmail.com',
-      password: 'achu0910',
-      role: 'admin',
-      isActive: true
-    });
-    
-    await admin.save();
-    console.log('✅ Admin user created successfully');
     console.log('Email: subscriblyinfo@gmail.com');
     console.log('Password: achu0910');
     
