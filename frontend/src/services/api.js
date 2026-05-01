@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 class ApiService {
   constructor() {
@@ -124,11 +124,11 @@ class ApiService {
       method: 'POST',
       body: JSON.stringify(credentials)
     });
-    
+
     if (response.success && response.token) {
       this.setToken(response.token);
     }
-    
+
     return response;
   }
 
@@ -137,11 +137,11 @@ class ApiService {
       method: 'POST',
       body: JSON.stringify(googleData)
     });
-    
+
     if (response.success && response.token) {
       this.setToken(response.token);
     }
-    
+
     return response;
   }
 
@@ -153,7 +153,7 @@ class ApiService {
     const response = await this.request('/auth/logout', {
       method: 'POST'
     });
-    
+
     this.removeToken();
     return response;
   }
@@ -233,12 +233,12 @@ class ApiService {
       method: 'POST',
       body: JSON.stringify(credentials)
     });
-    
+
     if (response.success && response.token) {
       this.setToken(response.token);
       localStorage.setItem('isAdmin', 'true');
     }
-    
+
     return response;
   }
 
